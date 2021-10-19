@@ -12,7 +12,7 @@ from flask import json, session, jsonify
 from backend.config import db, mail
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
-from backend.variableDB import user, host, database
+from backend.variableDB import user, host, database, password
 from flask_mail import Message
 
 var_dict = {}
@@ -176,7 +176,7 @@ class InputFile(Resource):
                 return jsonify({'error': 'Received documents folder'})
             text = file.split('.')
             # print(z)
-            engine = create_engine(f"mysql+mysqlconnector://{user}@{host}/{database}")
+            engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
             for x in text:
                 if x == 'csv':
                     df = pd.read_csv(z[0])
