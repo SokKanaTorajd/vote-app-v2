@@ -1,0 +1,14 @@
+Flask==2.0.1
+Flask-Cors
+Flask-JWT-Extended
+Flask-Mail
+Flask-RESTful
+Flask-Session
+Flask-SQLAlchemy
+pandas
+passlib
+SQLAlchemy
+pymysql
+python-dotenv
+gunicorn
+mysql-connector-python
