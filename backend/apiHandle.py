@@ -176,7 +176,7 @@ class InputFile(Resource):
                 return jsonify({'error': 'Received documents folder'})
             text = file.split('.')
             # print(z)
-            engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
+            engine = create_engine(f"mysql://{user}:{password}@{host}/{database}")
             for x in text:
                 if x == 'csv':
                     df = pd.read_csv(z[0])
