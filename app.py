@@ -15,17 +15,11 @@ api.add_resource(SentMail, '/mail/<nm_organisasi>', endpoint='mail')
 api.add_resource(FieldVoting, '/voting/<access_token>/<id>', endpoint='choice')
 api.add_resource(fieldVisual, '/visual/<id>', endpoint='visual')
 
-# @app.route('/set')
-# def set():
-#     session['nama'] = 're'
-#     print(session)
-#     return 'your session: {}'.format(session)
-
-# @app.route('/get')
-# def get():
-#     print(session)
-#     return 'your session {}'.format(session.get())
+@app.route('/')
+def index():
+    return 'API oke!'
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
     db.create_all()
