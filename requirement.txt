@@ -10,3 +10,4 @@ passlib
 SQLAlchemy
 pymysql
 python-dotenv
+gunicorn
