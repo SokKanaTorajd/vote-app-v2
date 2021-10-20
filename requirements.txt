@@ -12,5 +12,3 @@ pymysql
 python-dotenv
 gunicorn
 mysql-connector-python
-Flask-Migrate
-flask-script
