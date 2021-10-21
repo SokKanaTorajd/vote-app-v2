@@ -166,10 +166,10 @@ class InputFile(Resource):
         file = data['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
 
-        def find_file(basedir, filename):
-            for dirname, dirs, files in os.walk(basedir):
-                if filename in files:
-                    yield(os.path.join(dirname, filename))
+        # def find_file(basedir, filename):
+        #     for dirname, dirs, files in os.walk(basedir):
+        #         if filename in files:
+        #             yield(os.path.join(dirname, filename))
         # try:
         z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
         # if len(z) == 0:
