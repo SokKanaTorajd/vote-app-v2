@@ -171,7 +171,9 @@ class InputFile(Resource):
         file = data['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
         try:
-            z = [flex for flex in self.find_file(os.path.expanduser('~/Documents'), file)]
+            z = []
+            for flex in self.find_file(os.path.expanduser('~/Documents'), file):
+                z.append(flex)
             if len(z) == 0:
                 return jsonify({'error': 'Received documents folder'})
             text = file.split('.')
