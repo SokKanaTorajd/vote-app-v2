@@ -171,7 +171,7 @@ class InputFile(Resource):
                 if filename in files:
                     yield(os.path.join(dirname, filename))
         # try:
-        z = [flex for flex in self.find_file(os.path.expanduser('~/Documents'), file)]
+        z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
         if len(z) == 0:
             return jsonify({'error': 'Received documents folder'})
         text = file.split('.')
