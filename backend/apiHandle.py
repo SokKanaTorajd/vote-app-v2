@@ -250,53 +250,45 @@ class CandidateIdentity(Resource):
             if filename in files:
                 yield(os.path.join(dirname, filename))
 
-    class CandidateName(Resource):
-    def __init__(self):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('nm_pemilihan', help='Entry name of voting event')
-        self.parser.add_argument('jumlah_kandidat', help='how many participant')
-        self.parser.add_argument('id', help='Otomatis')
-
-    def post(self, id):
+     def post(self, id):
         data = self.parser.parse_args()
-        nm_pemilihan = data['nm_pemilihan']
-        jumlah_kandidat = data['jumlah_kandidat']
-        if nm_pemilihan == '':
-            return jsonify({
-                'error' : 'Please entry something'
-            })
+        nama = data['nama']
+        foto = data['foto'].encode()
+        visi_misi = data['visi_misi']
+        no_kandidat = data['no_kandidat']
+        fakultas = data['fakultas']
         try:
-            organisasi_table = Organisasi.query.filter_by(id=id).first()
-            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+            k_table = Kandidat.query.filter_by(id=id).first()
+            data = Ref_User()
+            target = data.kandidat_identity_table(id)
 
-
-            if k_table is not None:
-                k_table.nm_pemilihan =nm_pemilihan
-                k_table.jumlah_kandidat = jumlah_kandidat
-                db.session.add(k_table)
+            ki_table = Kandidat_identity.query.filter_by(no_kandidat=no_kandidat).filter_by(id_kandidat=id).first()
+            if ki_table is not None:
+                ki_table.foto = foto 
+                ki_table.nama = nama 
+                ki_table.visi_misi = visi_misi
+                ki_table.fakultas = fakultas
+                ki_table.no_kandidat = no_kandidat
+                db.session.add(ki_table)
                 db.session.commit()
                 return jsonify({
-                    'id_kandidat': k_table.id,
-                    'success': 'Data event has been updated',
+                    'error': 'Data candidate has been updated'
                 })
-            
-            query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
-            db.session.add(query)
+
+            if k_table.jumlah_kandidat == len(target):
+                return jsonify({
+                    'error': 'Data reaches the limit according to your event input'
+                })
+
+            query_add = Kandidat_identity(kandidat_identity=k_table, foto=foto, nama=nama, visi_misi=visi_misi, no_kandidat=no_kandidat, fakultas=fakultas)
+            db.session.add(query_add)
             db.session.commit()
 
-            queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
             return jsonify({
-                'id_kandidat': queries.id,
-                'nm_pemilihan' : nm_pemilihan,
-                'jadwal': str(queries.jadwal),
-                'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
+                'success': 'Your entry has saved in database',
             })
-
         except:
-            return jsonify({
-                'error': 'Sorry system error'
-            })
-
+            return jsonify({'error' : 'System fail detect'})
 
 
 class UserSignin(Resource):
