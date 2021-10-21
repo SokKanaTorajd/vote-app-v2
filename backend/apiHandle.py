@@ -161,32 +161,30 @@ class InputFile(Resource):
         self.parser.add_argument('file', type=str, help='This form so essential')
         self.parser.add_argument('nm_organisasi', type=str, help='Completed Your access token')
 
-    def find_file(self,basedir, filename):
-        for dirname, dirs, files in os.walk(basedir):
-            if filename in files:
-                yield(os.path.join(dirname, filename))
-
     def post(self, nm_organisasi):
         data = self.parser.parse_args()
         file = data['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
+
+        def find_file(basedir, filename):
+            for dirname, dirs, files in os.walk(basedir):
+                if filename in files:
+                    yield(os.path.join(dirname, filename))
         try:
-            z = []
-            for flex in self.find_file(os.path.expanduser('~/Documents'), file):
-                z.append(flex)
-            if len(z) == 0:
-                return jsonify({'error': 'Received documents folder'})
+            z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
+            # if len(z) == 0:
+            #     return jsonify({'error': 'Received documents folder'})
             text = file.split('.')
             # print(z)
             engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
             for x in text:
                 if x == 'csv':
-                    df = pd.read_csv(z[0])
+                    df = pd.read_csv(f"C:/Users/user/Documents/{file}")
                     df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                     df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                     return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
                 elif x == 'xlsx':
-                    df = pd.read_excel(z[0])
+                    df = pd.read_excel(f"C:/Users/user/Documents/{file}")
                     df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                     df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                     # print('excel')
@@ -252,45 +250,53 @@ class CandidateIdentity(Resource):
             if filename in files:
                 yield(os.path.join(dirname, filename))
 
+    class CandidateName(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('nm_pemilihan', help='Entry name of voting event')
+        self.parser.add_argument('jumlah_kandidat', help='how many participant')
+        self.parser.add_argument('id', help='Otomatis')
+
     def post(self, id):
         data = self.parser.parse_args()
-        nama = data['nama']
-        foto = data['foto'].encode()
-        visi_misi = data['visi_misi']
-        no_kandidat = data['no_kandidat']
-        fakultas = data['fakultas']
+        nm_pemilihan = data['nm_pemilihan']
+        jumlah_kandidat = data['jumlah_kandidat']
+        if nm_pemilihan == '':
+            return jsonify({
+                'error' : 'Please entry something'
+            })
         try:
-            k_table = Kandidat.query.filter_by(id=id).first()
-            data = Ref_User()
-            target = data.kandidat_identity_table(id)
+            organisasi_table = Organisasi.query.filter_by(id=id).first()
+            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
 
-            ki_table = Kandidat_identity.query.filter_by(no_kandidat=no_kandidat).filter_by(id_kandidat=id).first()
-            if ki_table is not None:
-                ki_table.foto = foto 
-                ki_table.nama = nama 
-                ki_table.visi_misi = visi_misi
-                ki_table.fakultas = fakultas
-                ki_table.no_kandidat = no_kandidat
-                db.session.add(ki_table)
+
+            if k_table is not None:
+                k_table.nm_pemilihan =nm_pemilihan
+                k_table.jumlah_kandidat = jumlah_kandidat
+                db.session.add(k_table)
                 db.session.commit()
                 return jsonify({
-                    'error': 'Data candidate has been updated'
+                    'id_kandidat': k_table.id,
+                    'success': 'Data event has been updated',
                 })
-
-            if k_table.jumlah_kandidat == len(target):
-                return jsonify({
-                    'error': 'Data reaches the limit according to your event input'
-                })
-
-            query_add = Kandidat_identity(kandidat_identity=k_table, foto=foto, nama=nama, visi_misi=visi_misi, no_kandidat=no_kandidat, fakultas=fakultas)
-            db.session.add(query_add)
+            
+            query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
+            db.session.add(query)
             db.session.commit()
 
+            queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
             return jsonify({
-                'success': 'Your entry has saved in database',
+                'id_kandidat': queries.id,
+                'nm_pemilihan' : nm_pemilihan,
+                'jadwal': str(queries.jadwal),
+                'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
             })
+
         except:
-            return jsonify({'error' : 'System fail detect'})
+            return jsonify({
+                'error': 'Sorry system error'
+            })
+
 
 
 class UserSignin(Resource):

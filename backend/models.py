@@ -12,7 +12,7 @@ class Organisasi(db.Model):
 
 class Kandidat(db.Model):
         id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-        id_organisasi = db.Column(db.Integer, db.ForeignKey('organisasi.id', ondelete='CASCADE'))
+        id_organisasi = db.Column(db.BigInteger, db.ForeignKey('organisasi.id', ondelete='CASCADE'))
         nm_pemilihan = db.Column(db.String(100), nullable=False)
         jumlah_kandidat = db.Column(db.Integer, nullable=False)
         jadwal = db.Column(db.Date, default=datetime.today())
@@ -21,7 +21,7 @@ class Kandidat(db.Model):
 
 class Kandidat_identity(db.Model): 
         id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-        id_kandidat = db.Column(db.Integer, db.ForeignKey('kandidat.id', ondelete='CASCADE'))
+        id_kandidat = db.Column(db.BigInteger, db.ForeignKey('kandidat.id', ondelete='CASCADE'))
         foto = db.Column(MEDIUMBLOB, nullable=False)
         nama = db.Column(db.String(100), nullable=False)
         visi_misi = db.Column(db.String(255), nullable=False)
@@ -31,6 +31,6 @@ class Kandidat_identity(db.Model):
 
 class Voting(db.Model):
         id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-        id_choice = db.Column(db.Integer, db.ForeignKey('kandidat_identity.id', ondelete='CASCADE'))
+        id_choice = db.Column(db.BigInteger, db.ForeignKey('kandidat_identity.id', ondelete='CASCADE'))
         access_token = db.Column(db.String(255), nullable=False)
 
