@@ -170,33 +170,33 @@ class InputFile(Resource):
             for dirname, dirs, files in os.walk(basedir):
                 if filename in files:
                     yield(os.path.join(dirname, filename))
-        try:
-            z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-            # if len(z) == 0:
-            #     return jsonify({'error': 'Received documents folder'})
-            text = file.split('.')
-            # print(z)
-            engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
-            for x in text:
-                if x == 'csv':
-                    df = pd.read_csv(f"C:/Users/user/Documents/{file}")
-                    df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                    df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                    return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
-                elif x == 'xlsx':
-                    df = pd.read_excel(f"C:/Users/user/Documents/{file}")
-                    df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                    df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                    # print('excel')
-                    return jsonify({'file': f'{file} success uploaded, Sample data will be up for you'})
-                elif x == 'jpeg':
-                    return jsonify({'error': 'file not required'})
-                elif x == 'jpg':
-                    return jsonify({'error': 'file not required'})
-                elif x == 'png':
-                    return jsonify({'error': 'file not required'})
-        except:
-            return jsonify({'error' : "Your file must under 16MB"})
+        # try:
+        z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
+        # if len(z) == 0:
+        #     return jsonify({'error': 'Received documents folder'})
+        text = file.split('.')
+        # print(z)
+        engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
+        for x in text:
+            if x == 'csv':
+                df = pd.read_csv(f"C:/Users/user/Documents/{file}")
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
+                return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
+            elif x == 'xlsx':
+                df = pd.read_excel(f"C:/Users/user/Documents/{file}")
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
+                # print('excel')
+                return jsonify({'file': f'{file} success uploaded, Sample data will be up for you'})
+            elif x == 'jpeg':
+                return jsonify({'error': 'file not required'})
+            elif x == 'jpg':
+                return jsonify({'error': 'file not required'})
+            elif x == 'png':
+                return jsonify({'error': 'file not required'})
+        # except:
+        #     return jsonify({'error' : "Your file must under 16MB"})
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
