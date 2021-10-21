@@ -10,7 +10,6 @@ from datetime import *
 from flask_mail import Mail
 
 app = Flask(__name__)
-app.permanent_session_lifetime = timedelta(hours=8)
 app.config['SECRET_KEY'] = secret_key
 app.config['JWT_SECRET_KEY'] = jwt_key
 app.config['SESSION_PERMANENT'] = True
