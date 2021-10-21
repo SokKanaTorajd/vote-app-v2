@@ -251,51 +251,51 @@ class CandidateIdentity(Resource):
                 yield(os.path.join(dirname, filename))
 
     class CandidateName(Resource):
-    def __init__(self):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('nm_pemilihan', help='Entry name of voting event')
-        self.parser.add_argument('jumlah_kandidat', help='how many participant')
-        self.parser.add_argument('id', help='Otomatis')
+        def __init__(self):
+            self.parser = reqparse.RequestParser()
+            self.parser.add_argument('nm_pemilihan', help='Entry name of voting event')
+            self.parser.add_argument('jumlah_kandidat', help='how many participant')
+            self.parser.add_argument('id', help='Otomatis')
 
-    def post(self, id):
-        data = self.parser.parse_args()
-        nm_pemilihan = data['nm_pemilihan']
-        jumlah_kandidat = data['jumlah_kandidat']
-        if nm_pemilihan == '':
-            return jsonify({
-                'error' : 'Please entry something'
-            })
-        try:
-            organisasi_table = Organisasi.query.filter_by(id=id).first()
-            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
-
-
-            if k_table is not None:
-                k_table.nm_pemilihan =nm_pemilihan
-                k_table.jumlah_kandidat = jumlah_kandidat
-                db.session.add(k_table)
-                db.session.commit()
+        def post(self, id):
+            data = self.parser.parse_args()
+            nm_pemilihan = data['nm_pemilihan']
+            jumlah_kandidat = data['jumlah_kandidat']
+            if nm_pemilihan == '':
                 return jsonify({
-                    'id_kandidat': k_table.id,
-                    'success': 'Data event has been updated',
+                    'error' : 'Please entry something'
                 })
-            
-            query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
-            db.session.add(query)
-            db.session.commit()
+            try:
+                organisasi_table = Organisasi.query.filter_by(id=id).first()
+                k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
 
-            queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
-            return jsonify({
-                'id_kandidat': queries.id,
-                'nm_pemilihan' : nm_pemilihan,
-                'jadwal': str(queries.jadwal),
-                'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
-            })
 
-        except:
-            return jsonify({
-                'error': 'Sorry system error'
-            })
+                if k_table is not None:
+                    k_table.nm_pemilihan =nm_pemilihan
+                    k_table.jumlah_kandidat = jumlah_kandidat
+                    db.session.add(k_table)
+                    db.session.commit()
+                    return jsonify({
+                        'id_kandidat': k_table.id,
+                        'success': 'Data event has been updated',
+                    })
+                
+                query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
+                db.session.add(query)
+                db.session.commit()
+
+                queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+                return jsonify({
+                    'id_kandidat': queries.id,
+                    'nm_pemilihan' : nm_pemilihan,
+                    'jadwal': str(queries.jadwal),
+                    'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
+                })
+
+            except:
+                return jsonify({
+                    'error': 'Sorry system error'
+                })
 
 
 
