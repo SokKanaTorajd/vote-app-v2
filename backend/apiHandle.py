@@ -172,19 +172,19 @@ class InputFile(Resource):
                     yield(os.path.join(dirname, filename))
         # try:
         z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-        # if len(z) == 0:
-        #     return jsonify({'error': 'Received documents folder'})
+        if len(z) == 0:
+            return jsonify({'error': 'Received documents folder'})
         text = file.split('.')
         # print(z)
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
-                df = pd.read_csv(f"C:/Users/user/Documents/{file}")
+                df = pd.read_csv(z[0])
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
             elif x == 'xlsx':
-                df = pd.read_excel(f"C:/Users/user/Documents/{file}")
+                df = pd.read_excel(z[0])
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 # print('excel')
