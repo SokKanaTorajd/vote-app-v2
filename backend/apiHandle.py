@@ -179,7 +179,7 @@ class InputFile(Resource):
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
-                df = df = pd.read_csv(f'C:/Users/user/Documents/{file}')
+                df = df = pd.read_csv(f'C:\Users\user\Documents\{file}')
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
