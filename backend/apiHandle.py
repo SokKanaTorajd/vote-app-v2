@@ -177,16 +177,15 @@ class InputFile(Resource):
         #     return jsonify({'error': 'Received documents folder'})
         files.save(os.path.join(app.config['UPLOAD_FOLDER'], file))
         text = file.split('.')
-        filename = os.path.expanduser(f'~/backend/uploads/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
-                df = pd.read_csv(filename)
+                df = pd.read_csv(f'/app/{file}')
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
             elif x == 'xlsx':
-                df = pd.read_excel(filename)
+                df = pd.read_excel(f'/app/{file}')
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 # print('excel')
