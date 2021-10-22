@@ -166,6 +166,7 @@ class InputFile(Resource):
         file = data['file']
 
         files = request.files['file']
+        print(files)
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
 
         # def find_file(basedir, filename):
