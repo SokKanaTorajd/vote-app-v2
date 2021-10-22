@@ -12,3 +12,4 @@ pymysql
 python-dotenv
 gunicorn
 mysql-connector-python
+werkzeug

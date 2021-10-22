@@ -14,6 +14,7 @@ from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
 from backend.variableDB import user, host, database, password
 from flask_mail import Message
+from werkzeug.utils import secure_filename
 
 var_dict = {}
 
@@ -175,7 +176,7 @@ class InputFile(Resource):
         # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
         # if len(z) == 0:
         #     return jsonify({'error': 'Received documents folder'})
-        files.save(app.config['UPLOAD_FOLDER'] + '/' + file)
+        files.save(app.config['UPLOAD_FOLDER'] + '/' + secure_filename(files.filename))
         text = file.split('.')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
