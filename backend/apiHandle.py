@@ -8,7 +8,7 @@ import uuid, base64
 import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
-from flask import json, session, jsonify
+from flask import jsonify, request
 from backend.config import db, mail, app
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
@@ -164,6 +164,8 @@ class InputFile(Resource):
     def post(self, nm_organisasi):
         data = self.parser.parse_args()
         file = data['file']
+
+        files = request.files['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
 
         # def find_file(basedir, filename):
@@ -174,7 +176,7 @@ class InputFile(Resource):
         # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
         # if len(z) == 0:
         #     return jsonify({'error': 'Received documents folder'})
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file))
+        files.save(os.path.join(app.config['UPLOAD_FOLDER'], file))
         text = file.split('.')
         filename = os.path.expanduser(f'~/backend/uploads/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
