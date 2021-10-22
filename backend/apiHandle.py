@@ -176,7 +176,7 @@ class InputFile(Resource):
         #     return jsonify({'error': 'Received documents folder'})
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], file))
         text = file.split('.')
-        filename = os.path.expanduser(f'~/uploads/{file}')
+        filename = os.path.expanduser(f'~/backend/uploads/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
