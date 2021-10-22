@@ -171,9 +171,9 @@ class InputFile(Resource):
                 if filename in files:
                     yield(os.path.join(dirname, filename))
         # # try:
-        z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-        if len(z) == 0:
-            return jsonify({'error': 'Received documents folder'})
+        # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
+        # if len(z) == 0:
+        #     return jsonify({'error': 'Received documents folder'})
         text = file.split('.')
         filename = os.path.expanduser(f'~/Documents/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
