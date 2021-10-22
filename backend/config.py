@@ -14,7 +14,9 @@ app.config['SECRET_KEY'] = secret_key
 app.config['JWT_SECRET_KEY'] = jwt_key
 app.config['SESSION_PERMANENT'] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{user}:{password}@{host}/{database}"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False 
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+app.config['UPLOAD_FOLDER'] = '/uploads/'
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465

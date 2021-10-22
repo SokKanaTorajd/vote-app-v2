@@ -9,7 +9,7 @@ import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
 from flask import json, session, jsonify
-from backend.config import db, mail
+from backend.config import db, mail, app
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
 from backend.variableDB import user, host, database, password
@@ -166,16 +166,17 @@ class InputFile(Resource):
         file = data['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
 
-        def find_file(basedir, filename):
-            for dirname, dirs, files in os.walk(basedir):
-                if filename in files:
-                    yield(os.path.join(dirname, filename))
+        # def find_file(basedir, filename):
+        #     for dirname, dirs, files in os.walk(basedir):
+        #         if filename in files:
+        #             yield(os.path.join(dirname, filename))
         # # try:
         # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
         # if len(z) == 0:
         #     return jsonify({'error': 'Received documents folder'})
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file))
         text = file.split('.')
-        filename = os.path.expanduser(f'~/Documents/{file}')
+        filename = os.path.expanduser(f'~/uploads/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
