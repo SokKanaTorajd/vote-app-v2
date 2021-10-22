@@ -61,7 +61,6 @@ class OrganisasiSigin(Resource):
         data = self.parser.parse_args()
         nm_organisasi = data['nm_organisasi']
         password = data['password']
-        session["organisasi"] = nm_organisasi
         access_token = create_access_token(identity=nm_organisasi)
         cross_check = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
         try:
