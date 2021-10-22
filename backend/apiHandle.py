@@ -166,25 +166,25 @@ class InputFile(Resource):
         file = data['file']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
 
-        # def find_file(basedir, filename):
-        #     for dirname, dirs, files in os.walk(basedir):
-        #         if filename in files:
-        #             yield(os.path.join(dirname, filename))
+        def find_file(basedir, filename):
+            for dirname, dirs, files in os.walk(basedir):
+                if filename in files:
+                    yield(os.path.join(dirname, filename))
         # # try:
-        # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-        # if len(z) == 0:
-        #     return jsonify({'error': 'Received documents folder'})
+        z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
+        if len(z) == 0:
+            return jsonify({'error': 'Received documents folder'})
         text = file.split('.')
-        # print(z)
+        filename = os.path.expanduser(f'~/Documents/{file}')
         engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
         for x in text:
             if x == 'csv':
-                df = pd.read_csv(file)
+                df = pd.read_csv(filename)
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
             elif x == 'xlsx':
-                df = pd.read_excel(file)
+                df = pd.read_excel(filename)
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
                 # print('excel')
