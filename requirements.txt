@@ -12,5 +12,5 @@ pymysql
 python-dotenv
 gunicorn
 mysql-connector-python
-openpyxl==3.0.8
-xlrd==1.2.0
+openpyxl
+xlrd
