@@ -167,26 +167,26 @@ class InputFile(Resource):
         file = data['url']
         typeFile = data['type']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
-        try:
-            engine = create_engine(f"mysql+mysqlconnector://{user}+{password}@{host}/{database}")
-            if typeFile == 'excel':
-                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
-                df = pd.read_excel(path)
-                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
-                return jsonify({
-                    'file': 'File success convert'
-                })
-            elif typeFile == 'csv':
-                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
-                df = pd.read_csv(path)
-                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                return jsonify({
-                    'file': 'File success convert'
-                })
-        except:
-            return jsonify({'error' : "Please check type file csv or excel"})
+        # try:
+        engine = create_engine(f"mysql+mysqlconnector://{user}+{password}@{host}/{database}")
+        if typeFile == 'excel':
+            path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+            df = pd.read_excel(path)
+            df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+            df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
+            return jsonify({
+                'file': 'File success convert'
+            })
+        elif typeFile == 'csv':
+            path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+            df = pd.read_csv(path)
+            df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+            df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
+            return jsonify({
+                'file': 'File success convert'
+            })
+        # except:
+        #     return jsonify({'error' : "Please check type file csv or excel"})
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
