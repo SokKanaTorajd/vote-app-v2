@@ -11,7 +11,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor()
@@ -39,7 +39,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -53,7 +53,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -66,7 +66,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -79,7 +79,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -92,7 +92,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -105,7 +105,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
@@ -119,7 +119,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor.execute(f"drop table {nm_organisasi}")
@@ -130,7 +130,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database,
+                database=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
