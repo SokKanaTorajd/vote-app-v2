@@ -66,7 +66,7 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                db=database
+                db=database,
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
