@@ -134,11 +134,28 @@ class Ref_User:
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(f"select count(v.access_token) as total, ki.nama as nama_kandidat, k.nm_pemilihan as event from voting v, kandidat_identity ki, kandidat k where v.id_choice=ki.id and k.id_organisasi={id} and k.id=ki.id_kandidat group by ki.nama")
+        # cursor.execute(f"select count(v.access_token) as total, ki.nama as nama_kandidat, k.nm_pemilihan as event from voting v, kandidat_identity ki, kandidat k where v.id_choice=ki.id and k.id_organisasi={id} and k.id=ki.id_kandidat group by ki.nama")
+        cursor.execute(f"""
+            select
+                k.nm_pemilihan AS kegiatan,
+                ki.nama AS calon,
+                cte.total_suara as total_suara
+            from
+	            `dsc-voting-db`.kandidat_identity AS ki
+                join `dsc-voting-db`.kandidat as k on (ki.id_kandidat=k.id)
+                join `dsc-voting-db`.organisasi as org on (k.id_organisasi=org.id)
+                join 
+                (
+                    select 
+                        distinct (id_choice) as id_calon,
+                        count(id_choice) as total_suara
+                    from
+                        `dsc-voting-db`.voting
+                    group by id_calon
+                    ) as cte
+                on (cte.id_calon=ki.id and k.id_organisasi=2)
+        """) 
         fetch = cursor.fetchall()
         return fetch
-
-# SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
-# select count(v.access_token) as total, ki.nama as nama_kandidat, k.nm_pemilihan as event from `dsc-voting-db`.voting as v, `dsc-voting-db`.kandidat_identity as ki, `dsc-voting-db`.kandidat as k where v.id_choice=ki.id and k.id_organisasi=1 and k.id=ki.id_kandidat group by nama_kandidat
 
 

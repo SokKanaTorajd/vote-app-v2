@@ -131,28 +131,28 @@ class SentMail(Resource):
         self.parser = reqparse.RequestParser()
     
     def post(self, nm_organisasi):
-        # try:
-        data = Ref_User()
-        email_sistem = data.sendEmail(nm_organisasi)
-        
-        for i in range(len(email_sistem)):
-            mails = email_sistem[i]['Email']
-            names = email_sistem[i]['Nama']
-            tokens = email_sistem[i]['access_token']
-            msg = Message(
-                    'VoteApps Team',
-                    sender ='akhmadfaizal13@gmail.com',
-                    recipients = [mails]
-                )
-            msg.body = f"Hello {names} \nNow you have access to our system\nOrganization Name: {nm_organisasi}\nToken: {tokens}"
-            mail.send(msg)
-        return jsonify({
-            'success': 'Email has sending'
-        })
-        # except:
-        #     return jsonify({
-        #             'error':"System can't response"
-        #         })
+        try:
+            data = Ref_User()
+            email_sistem = data.sendEmail(nm_organisasi)
+            
+            for i in range(len(email_sistem)):
+                mails = email_sistem[i]['Email']
+                names = email_sistem[i]['Nama']
+                tokens = email_sistem[i]['access_token']
+                msg = Message(
+                        'VoteApps Team',
+                        sender ='akhmadfaizal13@gmail.com',
+                        recipients = [mails]
+                    )
+                msg.body = f"Hello {names} \nNow you have access to our system\nOrganization Name: {nm_organisasi}\nToken: {tokens}"
+                mail.send(msg)
+            return jsonify({
+                'success': 'Email has sending'
+            })
+        except:
+            return jsonify({
+                    'error':"System can't response"
+                })
 
 
 class InputFile(Resource):
