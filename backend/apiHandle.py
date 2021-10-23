@@ -391,9 +391,9 @@ class fieldVisual(Resource):
         y = data.votingField(id)
         # try:
         if len(y) != 0:
-            nama = [y[i]['nama_kandidat'] for i in range(len(y))]
-            total = [y[i]['total'] for i in range(len(y))]
-            event = [y[i]['event'] for i in range(len(y))]
+            nama = [y[i]['calon'] for i in range(len(y))]
+            total = [y[i]['total_suara'] for i in range(len(y))]
+            event = [y[i]['kegiatan'] for i in range(len(y))]
             return jsonify({
                 'nama_kandidat': nama,
                 'total': total,
