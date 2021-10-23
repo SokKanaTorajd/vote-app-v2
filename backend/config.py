@@ -16,8 +16,6 @@ app.config['SESSION_PERMANENT'] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{user}:{password}@{host}/{database}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config['UPLOAD_FOLDER'] = os.path.realpath('.') + '/'
-
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = f'{email}'

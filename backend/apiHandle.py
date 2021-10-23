@@ -8,8 +8,8 @@ import uuid, base64
 import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
-from flask import jsonify, request
-from backend.config import db, mail, app
+from flask import jsonif
+from backend.config import db, mail
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
 from backend.variableDB import user, host, database, password
@@ -158,48 +158,35 @@ class SentMail(Resource):
 class InputFile(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('file', type=str, help='This form so essential')
+        self.parser.add_argument('url', type=str, help='This form so essential')
+        self.parser.add_argument('type', type=str, help='This form so essential')
         self.parser.add_argument('nm_organisasi', type=str, help='Completed Your access token')
 
     def post(self, nm_organisasi):
         data = self.parser.parse_args()
-        file = data['file']
-
-        files = request.files['file']
-        print(files)
+        file = data['url']
+        typeFile = data['type']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
-
-        # def find_file(basedir, filename):
-        #     for dirname, dirs, files in os.walk(basedir):
-        #         if filename in files:
-        #             yield(os.path.join(dirname, filename))
-        # # try:
-        # z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-        # if len(z) == 0:
-        #     return jsonify({'error': 'Received documents folder'})
-        files.save(app.config['UPLOAD_FOLDER'] + '/' + secure_filename(files.filename))
-        text = file.split('.')
-        engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
-        for x in text:
-            if x == 'csv':
-                df = pd.read_csv(app.config['UPLOAD_FOLDER'] + '/' + file)
+        try
+            engine = create_engine(f"mysql+mysqlconnector://{user}@{host}/{database}")
+            if typeFile == 'excel':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_excel(path)
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
+                return jsonify({
+                    'file': 'File success convert'
+                })
+            elif typeFile == 'csv':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_csv(path)
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
                 df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
-            elif x == 'xlsx':
-                df = pd.read_excel(app.config['UPLOAD_FOLDER'] + '/' + file)
-                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                # print('excel')
-                return jsonify({'file': f'{file} success uploaded, Sample data will be up for you'})
-            elif x == 'jpeg':
-                return jsonify({'error': 'file not required'})
-            elif x == 'jpg':
-                return jsonify({'error': 'file not required'})
-            elif x == 'png':
-                return jsonify({'error': 'file not required'})
-        # except:
-        #     return jsonify({'error' : "Your file must under 16MB"})
+                return jsonify({
+                    'file': 'File success convert'
+                })
+        except:
+            return jsonify({'error' : "Please check type file csv or excel"})
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
