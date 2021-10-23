@@ -167,26 +167,26 @@ class InputFile(Resource):
         file = data['url']
         typeFile = data['type']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
-        # try:
-        engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
-        if typeFile == 'excel':
-            path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
-            df = pd.read_excel(path)
-            df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-            df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
-            return jsonify({
-                'file': 'File success convert'
-            })
-        elif typeFile == 'csv':
-            path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
-            df = pd.read_csv(path)
-            df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-            df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-            return jsonify({
-                'file': 'File success convert'
-            })
-        # except:
-        #     return jsonify({'error' : "Please check type file csv or excel"})
+        try:
+            engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
+            if typeFile == 'excel':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_excel(path)
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
+                return jsonify({
+                    'file': 'File success convert'
+                })
+            elif typeFile == 'csv':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_csv(path)
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
+                return jsonify({
+                    'file': 'File success convert'
+                })
+        except:
+            return jsonify({'error' : "Please check type file csv or excel"})
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
@@ -255,37 +255,37 @@ class CandidateIdentity(Resource):
                 return jsonify({
                     'error' : 'Please entry something'
                 })
-            try:
-                organisasi_table = Organisasi.query.filter_by(id=id).first()
-                k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+            # try:
+            organisasi_table = Organisasi.query.filter_by(id=id).first()
+            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
 
 
-                if k_table is not None:
-                    k_table.nm_pemilihan =nm_pemilihan
-                    k_table.jumlah_kandidat = jumlah_kandidat
-                    db.session.add(k_table)
-                    db.session.commit()
-                    return jsonify({
-                        'id_kandidat': k_table.id,
-                        'success': 'Data event has been updated',
-                    })
-                
-                query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
-                db.session.add(query)
+            if k_table is not None:
+                k_table.nm_pemilihan =nm_pemilihan
+                k_table.jumlah_kandidat = jumlah_kandidat
+                db.session.add(k_table)
                 db.session.commit()
-
-                queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
                 return jsonify({
-                    'id_kandidat': queries.id,
-                    'nm_pemilihan' : nm_pemilihan,
-                    'jadwal': str(queries.jadwal),
-                    'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
+                    'id_kandidat': k_table.id,
+                    'success': 'Data event has been updated',
                 })
+            
+            query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
+            db.session.add(query)
+            db.session.commit()
 
-            except:
-                return jsonify({
-                    'error': 'Sorry system error'
-                })
+            queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+            return jsonify({
+                'id_kandidat': queries.id,
+                'nm_pemilihan' : nm_pemilihan,
+                'jadwal': str(queries.jadwal),
+                'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
+            })
+
+            # except:
+            #     return jsonify({
+            #         'error': 'Sorry system error'
+            #     })
 
 
 
