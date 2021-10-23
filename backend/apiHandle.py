@@ -8,7 +8,7 @@ import uuid, base64
 import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
-from flask import jsonif
+from flask import jsonify
 from backend.config import db, mail
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
