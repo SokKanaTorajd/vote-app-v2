@@ -168,7 +168,7 @@ class InputFile(Resource):
         typeFile = data['type']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
         try:
-            engine = create_engine(f"mysql+mysqlconnector://{user}@{host}/{database}")
+            engine = create_engine(f"mysql+mysqlconnector://{user}+{password}@{host}/{database}")
             if typeFile == 'excel':
                 path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
                 df = pd.read_excel(path)
