@@ -247,38 +247,38 @@ class CandidateIdentity(Resource):
         visi_misi = data['visi_misi']
         no_kandidat = data['no_kandidat']
         fakultas = data['fakultas']
-        try:
-            k_table = Kandidat.query.filter_by(id=id).first()
-            data = Ref_User()
-            target = data.kandidat_identity_table(id)
+        # try:
+        k_table = Kandidat.query.filter_by(id=id).first()
+        data = Ref_User()
+        target = data.kandidat_identity_table(id)
 
-            ki_table = Kandidat_identity.query.filter_by(no_kandidat=no_kandidat).filter_by(id_kandidat=id).first()
-            if ki_table is not None:
-                ki_table.foto = foto 
-                ki_table.nama = nama 
-                ki_table.visi_misi = visi_misi
-                ki_table.fakultas = fakultas
-                ki_table.no_kandidat = no_kandidat
-                db.session.add(ki_table)
-                db.session.commit()
-                return jsonify({
-                    'error': 'Data candidate has been updated'
-                })
-
-            if k_table.jumlah_kandidat == len(target):
-                return jsonify({
-                    'error': 'Data reaches the limit according to your event input'
-                })
-
-            query_add = Kandidat_identity(kandidat_identity=k_table, foto=foto, nama=nama, visi_misi=visi_misi, no_kandidat=no_kandidat, fakultas=fakultas)
-            db.session.add(query_add)
+        ki_table = Kandidat_identity.query.filter_by(no_kandidat=no_kandidat).filter_by(id_kandidat=id).first()
+        if ki_table is not None:
+            ki_table.foto = foto 
+            ki_table.nama = nama 
+            ki_table.visi_misi = visi_misi
+            ki_table.fakultas = fakultas
+            ki_table.no_kandidat = no_kandidat
+            db.session.add(ki_table)
             db.session.commit()
-
             return jsonify({
-                'success': 'Your entry has saved in database',
+                'error': 'Data candidate has been updated'
             })
-        except:
-            return jsonify({'error' : 'System fail detect'})
+
+        if k_table.jumlah_kandidat == len(target):
+            return jsonify({
+                'error': 'Data reaches the limit according to your event input'
+            })
+
+        query_add = Kandidat_identity(kandidat_identity=k_table, foto=foto, nama=nama, visi_misi=visi_misi, no_kandidat=no_kandidat, fakultas=fakultas)
+        db.session.add(query_add)
+        db.session.commit()
+
+        return jsonify({
+            'success': 'Your entry has saved in database',
+        })
+        # except:
+        #     return jsonify({'error' : 'System fail detect'})
 
 
 class UserSignin(Resource):
