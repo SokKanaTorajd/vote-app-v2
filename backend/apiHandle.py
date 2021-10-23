@@ -389,21 +389,21 @@ class fieldVisual(Resource):
     def get(self, id):
         data = Ref_User()
         y = data.votingField(id)
-        try:
-            if len(y) != 0:
-                nama = [y[i]['nama_kandidat'] for i in range(len(y))]
-                total = [y[i]['total'] for i in range(len(y))]
-                event = [y[i]['event'] for i in range(len(y))]
-                return jsonify({
-                    'nama_kandidat': nama,
-                    'total': total,
-                    'event': event[0]
-                })
-            else:
-                return jsonify({
-                    'error': 'No voting yet'
-                })
-        except:
+        # try:
+        if len(y) != 0:
+            nama = [y[i]['nama_kandidat'] for i in range(len(y))]
+            total = [y[i]['total'] for i in range(len(y))]
+            event = [y[i]['event'] for i in range(len(y))]
             return jsonify({
-                'error': 'Error detect, contact your admin now'
+                'nama_kandidat': nama,
+                'total': total,
+                'event': event[0]
             })
+        else:
+            return jsonify({
+                'error': 'No voting yet'
+            })
+        # except:
+        #     return jsonify({
+        #         'error': 'Error detect, contact your admin now'
+        #     })

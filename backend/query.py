@@ -153,7 +153,7 @@ class Ref_User:
                         `dsc-voting-db`.voting
                     group by id_calon
                     ) as cte
-                on (cte.id_calon=ki.id and k.id_organisasi=2)
+                on (cte.id_calon=ki.id and k.id_organisasi={id})
         """) 
         fetch = cursor.fetchall()
         return fetch
