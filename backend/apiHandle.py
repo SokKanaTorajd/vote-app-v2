@@ -190,43 +190,43 @@ class InputFile(Resource):
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
-        try:    
-            y = model_table.selectAll(nm_organisasi)  
-            o_table = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
-            k_table = Kandidat.query.filter_by(id_organisasi=o_table.id).first()
-            ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
-            yx = model_table.selectQuery(o_table.id)
-            for i in range(len(yx)):
-                x = str(yx[i]['jadwal'])
-                split_1 = x.split('-')
-                convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
+        # try:    
+        y = model_table.selectAll(nm_organisasi)  
+        o_table = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
+        k_table = Kandidat.query.filter_by(id_organisasi=o_table.id).first()
+        ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
+        yx = model_table.selectQuery(o_table.id)
+        for i in range(len(yx)):
+            x = str(yx[i]['jadwal'])
+            split_1 = x.split('-')
+            convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
 
-                #jeda
-                jeda = str(convert_1.date() + timedelta(days=1))
-                split_2 = jeda.split('-')
-                convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
-                
-                #selisih
-                now = str(datetime.date(datetime.now()))
-                split_3 = now.split('-')
-                convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
-                
-                yz = convert_2.date() - convert_3.date()
-                if now==jeda or int(yz.days) == 0:
-                    xdb = Ref_User()
-                    xdb.deleteThreeTable(o_table.id, ki_table.id)
-                    xdb.dropDB(nm_organisasi)
-                    return jsonify({
-                        'error': 'Data has reached the time limit'
-                    })
-                else:
-                    return jsonify({
-                        'user': y,
-                    })   
-        except:
-            return jsonify({
-                'error' : 'Your table unknown'
-            })
+            #jeda
+            jeda = str(convert_1.date() + timedelta(days=1))
+            split_2 = jeda.split('-')
+            convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
+            
+            #selisih
+            now = str(datetime.date(datetime.now()))
+            split_3 = now.split('-')
+            convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
+            
+            yz = convert_2.date() - convert_3.date()
+            if now==jeda or int(yz.days) == 0:
+                xdb = Ref_User()
+                xdb.deleteThreeTable(o_table.id, ki_table.id)
+                xdb.dropDB(nm_organisasi)
+                return jsonify({
+                    'error': 'Data has reached the time limit'
+                })
+            else:
+                return jsonify({
+                    'user': y,
+                })   
+        # except:
+        #     return jsonify({
+        #         'error' : 'Your table unknown'
+        #     })
     
 class CandidateIdentity(Resource):
     def __init__(self):
