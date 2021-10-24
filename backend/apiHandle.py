@@ -192,10 +192,6 @@ class InputFile(Resource):
         model_table = Ref_User()
         try:    
             y = model_table.selectAll(nm_organisasi)  
-            if y: 
-                return jsonify({
-                    'user': y,
-                })   
             o_table = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
             k_table = Kandidat.query.filter_by(id_organisasi=o_table.id).first()
             ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
@@ -220,6 +216,13 @@ class InputFile(Resource):
                     xdb = Ref_User()
                     xdb.deleteThreeTable(o_table.id, ki_table.id)
                     xdb.dropDB(nm_organisasi)
+                    return jsonify({
+                        'error': 'Data has reached the time limit'
+                    })
+                else:
+                    return jsonify({
+                        'user': y,
+                    })   
         except:
             return jsonify({
                 'error' : 'Your table unknown'
@@ -354,32 +357,32 @@ class FieldVoting(Resource):
             ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
             yx = db.selectQuery(organisasi_table.id)
             for i in range(len(yx)):
-                    x = str(yx[i]['jadwal'])
-                    split_1 = x.split('-')
-                    convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
+                x = str(yx[i]['jadwal'])
+                split_1 = x.split('-')
+                convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
 
-                    #jeda
-                    jeda = str(convert_1.date() + timedelta(days=1))
-                    split_2 = jeda.split('-')
-                    convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
-                    
-                    #selisih
-                    now = str(datetime.date(datetime.now()))
-                    split_3 = now.split('-')
-                    convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
-                    
-                    yz = convert_2.date() - convert_3.date()
-                    if now==jeda or int(yz.days) == 0:
-                        xdb = Ref_User()
-                        xdb.deleteThreeTable(organisasi_table.id, ki_table.id)
-                        return jsonify({
-                            'error': 'Data has reached the maximum timeout'
-                        })
-                    else:
-                        return jsonify({
-                            'nm_pemilihan': k_table.nm_pemilihan,
-                            'voting': y
-                        })
+                #jeda
+                jeda = str(convert_1.date() + timedelta(days=1))
+                split_2 = jeda.split('-')
+                convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
+                
+                #selisih
+                now = str(datetime.date(datetime.now()))
+                split_3 = now.split('-')
+                convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
+                
+                yz = convert_2.date() - convert_3.date()
+                if now==jeda or int(yz.days) == 0:
+                    xdb = Ref_User()
+                    xdb.deleteThreeTable(organisasi_table.id, ki_table.id)
+                    return jsonify({
+                        'error': 'Data has reached the maximum timeout'
+                    })
+                else:
+                    return jsonify({
+                        'nm_pemilihan': k_table.nm_pemilihan,
+                        'voting': y
+                    })
         except: 
             return jsonify({
                 'error': 'Data not found'
@@ -389,21 +392,21 @@ class fieldVisual(Resource):
     def get(self, id):
         data = Ref_User()
         y = data.votingField(id)
-        # try:
-        if len(y) != 0:
-            nama = [y[i]['calon'] for i in range(len(y))]
-            total = [y[i]['total_suara'] for i in range(len(y))]
-            event = [y[i]['kegiatan'] for i in range(len(y))]
+        try:
+            if len(y) != 0:
+                nama = [y[i]['calon'] for i in range(len(y))]
+                total = [y[i]['total_suara'] for i in range(len(y))]
+                event = [y[i]['kegiatan'] for i in range(len(y))]
+                return jsonify({
+                    'nama_kandidat': nama,
+                    'total': total,
+                    'event': event[0]
+                })
+            else:
+                return jsonify({
+                    'error': 'No voting yet'
+                })
+        except:
             return jsonify({
-                'nama_kandidat': nama,
-                'total': total,
-                'event': event[0]
+                'error': 'Error detect, contact your admin now'
             })
-        else:
-            return jsonify({
-                'error': 'No voting yet'
-            })
-        # except:
-        #     return jsonify({
-        #         'error': 'Error detect, contact your admin now'
-        #     })
