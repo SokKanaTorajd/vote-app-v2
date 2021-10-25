@@ -192,10 +192,6 @@ class InputFile(Resource):
         model_table = Ref_User()
         try:    
             y = model_table.selectAll(nm_organisasi) 
-            if y:
-                return jsonify({
-                    'user': y,
-                }) 
             o_table = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
             k_table = Kandidat.query.filter_by(id_organisasi=o_table.id).first()
             ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
@@ -216,7 +212,11 @@ class InputFile(Resource):
                 convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
                 
                 yz = convert_2.date() - convert_3.date()
-                if now==jeda or int(yz.days) == 0:
+                if y:
+                    return jsonify({
+                        'user': y,
+                    }) 
+                elif now==jeda or int(yz.days) == 0:
                     xdb = Ref_User()
                     xdb.deleteThreeTable(o_table.id, ki_table.id)
                     xdb.dropDB(nm_organisasi)
