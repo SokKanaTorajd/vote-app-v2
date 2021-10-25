@@ -65,7 +65,7 @@ class OrganisasiSigin(Resource):
         access_token = create_access_token(identity=nm_organisasi)
         cross_check = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
         try:
-            if sha256_crypt.verify(password, cross_check.password) or cross_check is not None:
+            if sha256_crypt.verify(password, cross_check.password):
                 return jsonify({
                     'id_organisasi': cross_check.id,
                     'success': "OK",
