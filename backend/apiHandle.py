@@ -299,6 +299,11 @@ class UserSignin(Resource):
         try:
             nama_privasi = db_target.SelectNama(organisasi_table.nm_organisasi, access_token)
             x = db_target.Select(organisasi_table.nm_organisasi, access_token)
+            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+            if k_table is None:
+                return jsonify({
+                    'error': "Admin hasn't uploaded candidate data"
+                })
             if x: 
                 return jsonify({
                     'id_organisasi': organisasi_table.id,
