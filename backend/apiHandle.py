@@ -8,12 +8,13 @@ import uuid, base64
 import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
-from flask import json, session, jsonify
+from flask import jsonify
 from backend.config import db, mail
 from backend.models import Organisasi, Kandidat, Kandidat_identity, Voting
 from sqlalchemy import create_engine
 from backend.variableDB import user, host, database, password
 from flask_mail import Message
+from werkzeug.utils import secure_filename
 
 var_dict = {}
 
@@ -61,11 +62,10 @@ class OrganisasiSigin(Resource):
         data = self.parser.parse_args()
         nm_organisasi = data['nm_organisasi']
         password = data['password']
-        session["organisasi"] = nm_organisasi
         access_token = create_access_token(identity=nm_organisasi)
         cross_check = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
         try:
-            if sha256_crypt.verify(password, cross_check.password) or cross_check is not None:
+            if sha256_crypt.verify(password, cross_check.password):
                 return jsonify({
                     'id_organisasi': cross_check.id,
                     'success': "OK",
@@ -158,54 +158,44 @@ class SentMail(Resource):
 class InputFile(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('file', type=str, help='This form so essential')
+        self.parser.add_argument('url', type=str, help='This form so essential')
+        self.parser.add_argument('type', type=str, help='This form so essential')
         self.parser.add_argument('nm_organisasi', type=str, help='Completed Your access token')
 
     def post(self, nm_organisasi):
         data = self.parser.parse_args()
-        file = data['file']
+        file = data['url']
+        typeFile = data['type']
         organisasi = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
-
-        def find_file(basedir, filename):
-            for dirname, dirs, files in os.walk(basedir):
-                if filename in files:
-                    yield(os.path.join(dirname, filename))
         try:
-            z = [flex for flex in find_file(os.path.expanduser('~/Documents'), file)]
-            # if len(z) == 0:
-            #     return jsonify({'error': 'Received documents folder'})
-            text = file.split('.')
-            # print(z)
             engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{database}")
-            for x in text:
-                if x == 'csv':
-                    df = pd.read_csv(f"C:/Users/user/Documents/{file}")
-                    df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                    df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                    return jsonify({'file' : f'{file} success uploaded, Sample data will be up for you'})
-                elif x == 'xlsx':
-                    df = pd.read_excel(f"C:/Users/user/Documents/{file}")
-                    df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                    df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
-                    # print('excel')
-                    return jsonify({'file': f'{file} success uploaded, Sample data will be up for you'})
-                elif x == 'jpeg':
-                    return jsonify({'error': 'file not required'})
-                elif x == 'jpg':
-                    return jsonify({'error': 'file not required'})
-                elif x == 'png':
-                    return jsonify({'error': 'file not required'})
+            if typeFile == 'excel':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_excel(path)
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
+                return jsonify({
+                    'file': 'File success convert'
+                })
+            elif typeFile == 'csv':
+                path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
+                df = pd.read_csv(path)
+                df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace')
+                return jsonify({
+                    'file': 'File success convert'
+                })
         except:
-            return jsonify({'error' : "Your file must under 16MB"})
+            return jsonify({'error' : "Please check type file csv or excel"})
 
     def get(self, nm_organisasi):
         model_table = Ref_User()
         try:    
-            y = model_table.selectAll(nm_organisasi)  
-            if y: 
-                return jsonify({
-                    'user': y,
-                })   
+            y = model_table.selectAll(nm_organisasi) 
+        # if y:
+        #     return jsonify({
+        #         'user': y,
+        #     }) 
             o_table = Organisasi.query.filter_by(nm_organisasi=nm_organisasi).first()
             k_table = Kandidat.query.filter_by(id_organisasi=o_table.id).first()
             ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
@@ -216,7 +206,7 @@ class InputFile(Resource):
                 convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
 
                 #jeda
-                jeda = str(convert_1.date() + timedelta(days=6))
+                jeda = str(convert_1.date() + timedelta(days=1))
                 split_2 = jeda.split('-')
                 convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
                 
@@ -226,10 +216,17 @@ class InputFile(Resource):
                 convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
                 
                 yz = convert_2.date() - convert_3.date()
-                if now==jeda or int(yz.days) == 0:
+                if now!=jeda or int(yz.days) != 0:
+                    return jsonify({
+                        'user': y
+                    })
+                elif now==jeda or int(yz.days) == 0:
                     xdb = Ref_User()
                     xdb.deleteThreeTable(o_table.id, ki_table.id)
                     xdb.dropDB(nm_organisasi)
+                    return jsonify({
+                        'error': 'Data has reached the time limit'
+                    })   
         except:
             return jsonify({
                 'error' : 'Your table unknown'
@@ -250,53 +247,45 @@ class CandidateIdentity(Resource):
             if filename in files:
                 yield(os.path.join(dirname, filename))
 
-    class CandidateName(Resource):
-        def __init__(self):
-            self.parser = reqparse.RequestParser()
-            self.parser.add_argument('nm_pemilihan', help='Entry name of voting event')
-            self.parser.add_argument('jumlah_kandidat', help='how many participant')
-            self.parser.add_argument('id', help='Otomatis')
+    def post(self, id):
+        data = self.parser.parse_args()
+        nama = data['nama']
+        foto = data['foto'].encode()
+        visi_misi = data['visi_misi']
+        no_kandidat = data['no_kandidat']
+        fakultas = data['fakultas']
+        try:
+            k_table = Kandidat.query.filter_by(id=id).first()
+            data = Ref_User()
+            target = data.kandidat_identity_table(id)
 
-        def post(self, id):
-            data = self.parser.parse_args()
-            nm_pemilihan = data['nm_pemilihan']
-            jumlah_kandidat = data['jumlah_kandidat']
-            if nm_pemilihan == '':
-                return jsonify({
-                    'error' : 'Please entry something'
-                })
-            try:
-                organisasi_table = Organisasi.query.filter_by(id=id).first()
-                k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
-
-
-                if k_table is not None:
-                    k_table.nm_pemilihan =nm_pemilihan
-                    k_table.jumlah_kandidat = jumlah_kandidat
-                    db.session.add(k_table)
-                    db.session.commit()
-                    return jsonify({
-                        'id_kandidat': k_table.id,
-                        'success': 'Data event has been updated',
-                    })
-                
-                query = Kandidat(nm_pemilihan=nm_pemilihan, organisasi=organisasi_table, jumlah_kandidat=jumlah_kandidat)
-                db.session.add(query)
+            ki_table = Kandidat_identity.query.filter_by(no_kandidat=no_kandidat).filter_by(id_kandidat=id).first()
+            if ki_table is not None:
+                ki_table.foto = foto 
+                ki_table.nama = nama 
+                ki_table.visi_misi = visi_misi
+                ki_table.fakultas = fakultas
+                ki_table.no_kandidat = no_kandidat
+                db.session.add(ki_table)
                 db.session.commit()
-
-                queries = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
                 return jsonify({
-                    'id_kandidat': queries.id,
-                    'nm_pemilihan' : nm_pemilihan,
-                    'jadwal': str(queries.jadwal),
-                    'success': 'Your entry has saved in database, please entry identity of candidate in thereunder'
+                    'error': 'Data candidate has been updated'
                 })
 
-            except:
+            if k_table.jumlah_kandidat == len(target):
                 return jsonify({
-                    'error': 'Sorry system error'
+                    'error': 'Data reaches the limit according to your event input'
                 })
 
+            query_add = Kandidat_identity(kandidat_identity=k_table, foto=foto, nama=nama, visi_misi=visi_misi, no_kandidat=no_kandidat, fakultas=fakultas)
+            db.session.add(query_add)
+            db.session.commit()
+
+            return jsonify({
+                'success': 'Your entry has saved in database',
+            })
+        except:
+            return jsonify({'error' : 'System fail detect'})
 
 
 class UserSignin(Resource):
@@ -314,6 +303,11 @@ class UserSignin(Resource):
         try:
             nama_privasi = db_target.SelectNama(organisasi_table.nm_organisasi, access_token)
             x = db_target.Select(organisasi_table.nm_organisasi, access_token)
+            k_table = Kandidat.query.filter_by(id_organisasi=organisasi_table.id).first()
+            if k_table is None:
+                return jsonify({
+                    'error': "Admin hasn't uploaded candidate data"
+                })
             if x: 
                 return jsonify({
                     'id_organisasi': organisasi_table.id,
@@ -372,32 +366,32 @@ class FieldVoting(Resource):
             ki_table = Kandidat_identity.query.filter_by(id_kandidat=k_table.id).first()
             yx = db.selectQuery(organisasi_table.id)
             for i in range(len(yx)):
-                    x = str(yx[i]['jadwal'])
-                    split_1 = x.split('-')
-                    convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
+                x = str(yx[i]['jadwal'])
+                split_1 = x.split('-')
+                convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
 
-                    #jeda
-                    jeda = str(convert_1.date() + timedelta(days=6))
-                    split_2 = jeda.split('-')
-                    convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
-                    
-                    #selisih
-                    now = str(datetime.date(datetime.now()))
-                    split_3 = now.split('-')
-                    convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
-                    
-                    yz = convert_2.date() - convert_3.date()
-                    if now==jeda or int(yz.days) == 0:
-                        xdb = Ref_User()
-                        xdb.deleteThreeTable(organisasi_table.id, ki_table.id)
-                        return jsonify({
-                            'error': 'Data has reached the maximum timeout'
-                        })
-                    else:
-                        return jsonify({
-                            'nm_pemilihan': k_table.nm_pemilihan,
-                            'voting': y
-                        })
+                #jeda
+                jeda = str(convert_1.date() + timedelta(days=6))
+                split_2 = jeda.split('-')
+                convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
+                
+                #selisih
+                now = str(datetime.date(datetime.now()))
+                split_3 = now.split('-')
+                convert_3 = datetime(int(split_3[0]), int(split_3[1]), int(split_3[2]))
+                
+                yz = convert_2.date() - convert_3.date()
+                if now==jeda or int(yz.days) == 0:
+                    xdb = Ref_User()
+                    xdb.deleteThreeTable(organisasi_table.id, ki_table.id)
+                    return jsonify({
+                        'error': 'Data has reached the maximum timeout'
+                    })
+                else:
+                    return jsonify({
+                        'nm_pemilihan': k_table.nm_pemilihan,
+                        'voting': y
+                    })
         except: 
             return jsonify({
                 'error': 'Data not found'
@@ -409,9 +403,9 @@ class fieldVisual(Resource):
         y = data.votingField(id)
         try:
             if len(y) != 0:
-                nama = [y[i]['nama_kandidat'] for i in range(len(y))]
-                total = [y[i]['total'] for i in range(len(y))]
-                event = [y[i]['event'] for i in range(len(y))]
+                nama = [y[i]['calon'] for i in range(len(y))]
+                total = [y[i]['total_suara'] for i in range(len(y))]
+                event = [y[i]['kegiatan'] for i in range(len(y))]
                 return jsonify({
                     'nama_kandidat': nama,
                     'total': total,

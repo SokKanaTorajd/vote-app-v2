@@ -11,7 +11,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor()
 
@@ -38,7 +39,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.execute(f"SELECT * FROM {name} LIMIT 40")
@@ -51,7 +53,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.execute(f"SELECT ki.id, ki.foto, ki.nama, ki.visi_misi, ki.no_kandidat, ki.fakultas, k.nm_pemilihan, k.jadwal FROM kandidat_identity ki, kandidat k where ki.id_kandidat=k.id AND k.id_organisasi='{id}'")
@@ -63,10 +66,11 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(f"SELECT * from {nm_organisasi}")
+        cursor.execute(f"SELECT * FROM `dsc-voting-db`.{nm_organisasi}")
         fetch = cursor.fetchall()
         return fetch
 
@@ -75,7 +79,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.execute(f"SELECT * from kandidat_identity ki, kandidat k where ki.id_kandidat=k.id and ki.id_kandidat={id}")
@@ -87,7 +92,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.execute(f"SELECT v.access_token from kandidat k, kandidat_identity ki, voting v where k.id=ki.id_kandidat and v.id_choice=ki.id and ki.no_kandidat='{kandidat}' and k.id_organisasi='{id}' and k.id={event}")
@@ -99,7 +105,8 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
         cursor.execute(f"delete from kandidat where id_organisasi='{id1}'")
@@ -112,9 +119,10 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
-        cursor.execute(f"drop table {nm_organisasi}")
+        cursor.execute(f"DROP TABLE `dsc-voting-db`.`{nm_organisasi}`")
         db.commit()   
 
     def votingField(self, id):
@@ -122,9 +130,32 @@ class Ref_User:
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database='dsc-voting-db',
+                ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(f"select count(v.access_token) as total, ki.nama as nama_kandidat, k.nm_pemilihan as event from voting v, kandidat_identity ki, kandidat k where v.id_choice=ki.id and k.id_organisasi={id} and k.id=ki.id_kandidat group by ki.nama;")
+        # cursor.execute(f"select count(v.access_token) as total, ki.nama as nama_kandidat, k.nm_pemilihan as event from voting v, kandidat_identity ki, kandidat k where v.id_choice=ki.id and k.id_organisasi={id} and k.id=ki.id_kandidat group by ki.nama")
+        cursor.execute(f"""
+            select
+                k.nm_pemilihan AS kegiatan,
+                ki.nama AS calon,
+                cte.total_suara as total_suara
+            from
+	            `dsc-voting-db`.kandidat_identity AS ki
+                join `dsc-voting-db`.kandidat as k on (ki.id_kandidat=k.id)
+                join `dsc-voting-db`.organisasi as org on (k.id_organisasi=org.id)
+                join 
+                (
+                    select 
+                        distinct (id_choice) as id_calon,
+                        count(id_choice) as total_suara
+                    from
+                        `dsc-voting-db`.voting
+                    group by id_calon
+                    ) as cte
+                on (cte.id_calon=ki.id and k.id_organisasi={id})
+        """) 
         fetch = cursor.fetchall()
         return fetch
+
+
