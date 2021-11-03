@@ -206,7 +206,7 @@ class InputFile(Resource):
                 convert_1 = datetime(int(split_1[0]), int(split_1[1]), int(split_1[2]))
 
                 #jeda
-                jeda = str(convert_1.date() + timedelta(days=6))
+                jeda = str(convert_1.date() + timedelta(days=7))
                 split_2 = jeda.split('-')
                 convert_2 = datetime(int(split_2[0]), int(split_2[1]), int(split_2[2]))
                 
