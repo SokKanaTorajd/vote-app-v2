@@ -122,11 +122,7 @@ class Ref_User:
                 database='dsc-voting-db',
                 ssl={"fake_flag_to_enable_tls":True}
             )
-<<<<<<< HEAD
         cursor.execute(f"DROP TABLE `dsc-voting-db`.{nm_organisasi}")
-=======
-        cursor.execute(f"DROP TABLE `dsc-voting-db`.`{nm_organisasi}`")
->>>>>>> 93746cf955e9af7a6d0bce65133eca0699409ef5
         db.commit()   
 
     def votingField(self, id):
