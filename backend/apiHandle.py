@@ -282,7 +282,7 @@ class CandidateIdentity(Resource):
             db.session.commit()
 
             return jsonify({
-                'success': 'Your entry has saved in database',
+                'success': f'Candidate {nama} has saved in database',
             })
         except:
             return jsonify({'error' : 'System fail detect'})
