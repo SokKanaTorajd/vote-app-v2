@@ -43,7 +43,7 @@ class Ref_User:
                 ssl={"fake_flag_to_enable_tls":True}
             )
         cursor = db.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(f"SELECT * FROM 'dsc-voting-db'.{name} LIMIT 40")
+        cursor.execute(f"SELECT * FROM 'dsc-voting-db'.{name}")
         fetch = cursor.fetchall()
         # del fetch[0]['index']
         return fetch
