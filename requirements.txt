@@ -14,3 +14,4 @@ gunicorn
 mysql-connector-python
 openpyxl
 xlrd
+requests

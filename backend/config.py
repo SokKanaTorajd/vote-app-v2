@@ -16,12 +16,12 @@ app.config['SESSION_PERMANENT'] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{user}:{password}@{host}/{database}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config['MAIL_SERVER']='smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = f'{email}'
-app.config['MAIL_PASSWORD'] = f'{password_email}'
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+# app.config['MAIL_SERVER']='smtp.gmail.com'
+# app.config['MAIL_PORT'] = 465
+# app.config['MAIL_USERNAME'] = f'{email}'
+# app.config['MAIL_PASSWORD'] = f'{password_email}'
+# app.config['MAIL_USE_TLS'] = False
+# app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 jwt = JWTManager(app)

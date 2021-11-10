@@ -5,6 +5,7 @@ from passlib.hash import sha256_crypt
 import pandas as pd
 import os, sys
 import uuid, base64
+import requests
 import mysql.connector as sql
 from datetime import *
 from pandas import ExcelFile
@@ -139,13 +140,22 @@ class SentMail(Resource):
                 mails = email_sistem[i]['Email']
                 names = email_sistem[i]['Nama']
                 tokens = email_sistem[i]['access_token']
-                msg = Message(
-                        'VoteApps Team',
-                        sender ='akhmadfaizal13@gmail.com',
-                        recipients = [mails]
+                # msg = Message(
+                #         'VoteApps Team',
+                #         sender ='akhmadfaizal13@gmail.com',
+                #         recipients = [mails]
+                #     )
+                # msg.body = f"Hello {names} \nNow you have access to our system\nOrganization Name: {nm_organisasi}\nToken: {tokens}"
+                # mail.send(msg)
+                requests.post(
+		            "https://api.mailgun.net/v3/dsc-app.tech/messages",
+		            auth=("api", "6422881fa3233a254b201534bef4e65a-10eedde5-3b7c5fcd"),
+                        data={"from": "management@dsc-app.tech",
+                            "to": [mails],
+                            "subject": "VotingApps Team",
+                            "text": f"Dear {names}, \nNow you have access to our system, let voting your leader \nOrganization : {nm_organisasi} \nToken : {tokens}"
+                        }
                     )
-                msg.body = f"Hello {names} \nNow you have access to our system\nOrganization Name: {nm_organisasi}\nToken: {tokens}"
-                mail.send(msg)
             return jsonify({
                 'success': 'Email has sending'
             })
