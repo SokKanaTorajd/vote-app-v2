@@ -153,7 +153,7 @@ class SentMail(Resource):
                         data={"from": "management@dsc-app.tech",
                             "to": [mails],
                             "subject": "VotingApps Team",
-                            "text": f"Dear {names}, \nNow you have access to our system, let voting your leader \nOrganization : {nm_organisasi} \nToken : {tokens}"
+                            "text": f"Dear {names}, \nNow you have access to our system, let voting your leader in https://voteapp-v2.herokuapp.com/ \nOrganization : {nm_organisasi} \nToken : {tokens}"
                         }
                     )
             return jsonify({
