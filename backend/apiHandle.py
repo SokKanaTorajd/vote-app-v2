@@ -183,7 +183,7 @@ class InputFile(Resource):
                 path = 'https://drive.google.com/uc?export=download&id='+file.split('/')[-2]
                 df = pd.read_excel(path)
                 df['access_token'] = df['Nama'].apply(lambda _: str(uuid.uuid4()))
-                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='replace') 
+                df.to_sql(organisasi.nm_organisasi,con=engine, if_exists='append') 
                 return jsonify({
                     'file': 'File success convert'
                 })
